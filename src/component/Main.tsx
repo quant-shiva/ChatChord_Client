@@ -8,10 +8,24 @@ import {
 import routes from '../utils/routes';
 import IRoute from '../types/Route';
 import PrivateRoute from '../utils/PrivateRoute';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core';
+
+const theme = createMuiTheme({
+    palette:{
+        type:"dark",
+        primary:{
+            light: '#757ce8',
+            main: '#00acc1',
+            dark: '#00acc1',
+            contrastText: '#fff'
+        },
+    }
+})
 
 export class Main extends Component {
     render() {
         return (
+            <ThemeProvider theme={theme}>
             <div>
                 <Router>
                     <div>
@@ -34,6 +48,7 @@ export class Main extends Component {
                     </div>
                 </Router>
             </div>
+            </ThemeProvider>
         )
     }
 }
