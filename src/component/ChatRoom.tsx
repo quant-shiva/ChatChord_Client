@@ -1,11 +1,19 @@
 import React, { Component } from 'react'
+import { Container, CssBaseline, Avatar, Typography, Grid, TextField, FormControlLabel, Checkbox, Button, Link } from '@material-ui/core';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import firebaseApp from '../config/firebaseConfig';
+import { User } from 'firebase';
 
 export class ChatRoom extends Component {
+    
     render() {
         return (
-            <div>
-                It's Chat Room
-            </div>
+            <Container component="main" maxWidth="xs">
+                <CssBaseline />
+                <div>
+                    Hello
+                </div>
+            </Container>
         )
     }
 }

@@ -4,12 +4,13 @@ import NotFound from '../component/NotFound';
 
 export class PrivateRoute extends Component<RouteProps> {
     render() {
-        let auth = true;
+        let auth = localStorage.getItem("isAuthenticated");
+        console.log(auth);
         return (
             <Route 
             path={this.props.path}
             exact={this.props.exact}
-            component={auth ? this.props.component : NotFound}
+            component={auth === "true" ? this.props.component : NotFound}
             />
         )
     }

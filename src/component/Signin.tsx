@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -11,18 +11,74 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import firebaseApp from '../config/firebaseConfig';
+import { User } from 'firebase';
+import Alert from '@material-ui/lab/Alert';
 
 interface Props { };
 interface State {
-  classes: Record<"paper" | "avatar" | "form" | "submit" | "container", string>
-}
+  email:string,
+  password:string,
+  remember:boolean,
+  submited:boolean,
+  submitError:boolean,
+  submitMsg:string
+};
 
 export default class SignIn extends React.Component<Props, State>{
+
+  constructor(props:Props){
+    super(props);
+
+    this.state = {
+      email:"",
+      password:"",
+      remember:false,
+      submitError:false,
+      submitMsg:"",
+      submited:false
+    }
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(e: FormEvent){
+    e.preventDefault();
+    this.setState({submitError:false, submited:false},()=>{
+      firebaseApp.auth().signInWithEmailAndPassword(
+        this.state.email,this.state.password
+      ).then(cred=>{
+        if(firebaseApp.auth().currentUser?.emailVerified){
+        localStorage.setItem("isAuthenticated","true");
+        window.location.href = "/chat";
+        }
+        else this.setState({submitError:true, submitMsg:"Account not verified, please verify Email."})
+      })
+      .catch(error=>{
+        let errorCode = error.code;
+        switch (errorCode) {
+          case "auth/user-not-found":
+              this.setState({submitError:true, submitMsg:"User not found, try with another Email."})
+              break;
+          case "auth/invalid-email":
+              this.setState({submitError:true, submitMsg:"Email not valid, try with another Email."})
+              break;
+              case "auth/wrong-password":
+              this.setState({submitError:true, submitMsg:"Wrong password, try with correct password."})
+          break;
+      default:
+          this.setState({submitError:true, submitMsg:"Unable to signin."})
+          break;
+      }
+      })
+    })
+}
 
   render(){
     return (
       <Container component="main" maxWidth="xs">
         <CssBaseline />
+        {this.state.submited && <Alert severity="success">{this.state.submitMsg}</Alert>}
+        {this.state.submitError && <Alert severity="error">{this.state.submitMsg}</Alert>}
         <div>
           <Avatar>
             <LockOutlinedIcon />
@@ -30,7 +86,7 @@ export default class SignIn extends React.Component<Props, State>{
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form noValidate>
+          <form noValidate onSubmit={this.handleSubmit}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -41,6 +97,8 @@ export default class SignIn extends React.Component<Props, State>{
               name="email"
               autoComplete="email"
               autoFocus
+              value={this.state.email}
+              onChange={e=>this.setState({email:e.target.value})}
             />
             <TextField
               variant="outlined"
@@ -52,9 +110,11 @@ export default class SignIn extends React.Component<Props, State>{
               type="password"
               id="password"
               autoComplete="current-password"
+              value={this.state.password}
+              onChange={e=>this.setState({password:e.target.value})}
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={<Checkbox value="remember" color="primary" onClick={()=>this.setState({remember:!this.state.remember})}/>}
               label="Remember me"
             />
             <Button
@@ -62,39 +122,15 @@ export default class SignIn extends React.Component<Props, State>{
               fullWidth
               variant="contained"
               color="primary"
-              onClick={(e)=>{
-                e.preventDefault();
-                firebaseApp.auth().signInWithEmailAndPassword(
-                  "shivam9651566755@gmail.com","Shivam123@"
-                ).then(cred=>{console.log("Logged In : ",cred)})
-                .catch(error=>{
-                  let errorCode = error.code;
-                  let errorMessage = error.message;
-                  if (errorCode === 'auth/wrong-password') {
-                    alert('Wrong password.');
-                  } else {
-                    alert(errorMessage);
-                  }
-                  console.log(error);
-                })
-              }}
+              disabled={this.state.password === "" || this.state.email === ""}
             >
               Sign In
             </Button>
             <Grid container>
               <Grid item xs>
-                <div onClick={(e)=>{
-                  e.preventDefault();
-                  console.log(firebaseApp.auth().currentUser);
-                }}>
-                  Forgot password?
-                </div>
-                <div onClick={(e)=>{
-                  e.preventDefault();
-                  firebaseApp.auth().signOut();
-                }}>
-                  Logout
-                </div>
+              <Link href="#" variant="body2">
+                  {"Forget password?"}
+                </Link>
               </Grid>
               <Grid item>
                 <Link href="/signup" variant="body2">
