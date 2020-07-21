@@ -1,17 +1,26 @@
 import React, { Component } from 'react';
-import { Route, RouteProps } from 'react-router-dom';
-import NotFound from '../component/NotFound';
+import { Route, RouteProps, Redirect } from 'react-router-dom';
+import AuthContext from './AuthContext';
 
 export class PrivateRoute extends Component<RouteProps> {
+
+    static contextType = AuthContext;
+
     render() {
-        let auth = localStorage.getItem("isAuthenticated");
-        console.log(auth);
+        let auth = this.context.isVerified;
         return (
+            auth ? 
             <Route 
             path={this.props.path}
             exact={this.props.exact}
-            component={auth === "true" ? this.props.component : NotFound}
+            component={this.props.component}
             />
+            : <Route 
+            path={this.props.path}
+            exact={this.props.exact}
+            >
+                <Redirect to="/signin"/>
+            </Route>
         )
     }
 }

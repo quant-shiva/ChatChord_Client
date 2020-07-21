@@ -8,30 +8,23 @@ import {
 import routes from '../utils/routes';
 import IRoute from '../types/Route';
 import PrivateRoute from '../utils/PrivateRoute';
-import { ThemeProvider, createMuiTheme } from '@material-ui/core';
+import AuthContext from '../utils/AuthContext';
+import Loder from '../utils/LoderComponent';
 
-const theme = createMuiTheme({
-    palette:{
-        type:"dark",
-        primary:{
-            light: '#757ce8',
-            main: '#00acc1',
-            dark: '#00acc1',
-            contrastText: '#fff'
-        },
-    }
-})
 
 export class Main extends Component {
+    static contextType = AuthContext;
     render() {
         return (
-            <ThemeProvider theme={theme}>
-            <div>
+            <div>{
+                this.context.isVerifying ? <Loder/> :
                 <Router>
                     <div>
                         <Switch>
                             <Route exact path="/">
-                                <Redirect to="/signin"/>
+                                {
+                                    this.context.isVerified ? <Redirect to="/chat"/> : <Redirect to="/signin"/>
+                                }
                             </Route>
                             {
                                 routes.map((val:IRoute, i:number)=>{
@@ -46,9 +39,8 @@ export class Main extends Component {
                             }
                         </Switch>
                     </div>
-                </Router>
+                </Router>}
             </div>
-            </ThemeProvider>
         )
     }
 }

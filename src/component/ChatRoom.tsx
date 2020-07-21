@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
-import { Container, CssBaseline, Avatar, Typography, Grid, TextField, FormControlLabel, Checkbox, Button, Link } from '@material-ui/core';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import firebaseApp from '../config/firebaseConfig';
-import { User } from 'firebase';
+import { Container, CssBaseline, Button} from '@material-ui/core';
+import Auth from '../config/firebaseConfig';
 
 export class ChatRoom extends Component {
     
@@ -13,6 +11,15 @@ export class ChatRoom extends Component {
                 <div>
                     Hello
                 </div>
+                <Button variant="contained" color="secondary" onClick={()=>{
+                    Auth.signOut()
+                    .then(()=>{
+                        localStorage.removeItem("_ucr");
+                        window.location.href = "/signin";
+                    })
+                }}>
+                    Secondary
+                </Button>
             </Container>
         )
     }
