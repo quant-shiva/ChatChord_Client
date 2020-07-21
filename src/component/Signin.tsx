@@ -10,9 +10,9 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import firebaseApp from '../config/firebaseConfig';
-import { User } from 'firebase';
 import Alert from '@material-ui/lab/Alert';
+import Auth from '../config/firebaseConfig';
+import AuthContext from '../utils/AuthContext';
 
 interface Props { };
 interface State {
@@ -25,6 +25,8 @@ interface State {
 };
 
 export default class SignIn extends React.Component<Props, State>{
+
+  static contextType = AuthContext;
 
   constructor(props:Props){
     super(props);
@@ -44,11 +46,13 @@ export default class SignIn extends React.Component<Props, State>{
   handleSubmit(e: FormEvent){
     e.preventDefault();
     this.setState({submitError:false, submited:false},()=>{
-      firebaseApp.auth().signInWithEmailAndPassword(
+      Auth.signInWithEmailAndPassword(
         this.state.email,this.state.password
-      ).then(cred=>{
-        if(firebaseApp.auth().currentUser?.emailVerified){
-        localStorage.setItem("isAuthenticated","true");
+      ).then(async (cred)=>{
+        const user = Auth.currentUser;
+        if(user?.emailVerified){
+        localStorage.setItem("_ucr",await user.getIdToken());
+        this.context.onSignIn();
         window.location.href = "/chat";
         }
         else this.setState({submitError:true, submitMsg:"Account not verified, please verify Email."})

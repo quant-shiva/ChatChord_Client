@@ -11,8 +11,8 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { User } from 'firebase/app';
-import firebaseApp from '../config/firebaseConfig';
 import Alert from '@material-ui/lab/Alert';
+import Auth from '../config/firebaseConfig';
 
 interface Props {};
 interface State {
@@ -48,11 +48,11 @@ export default class SignUp extends React.Component<Props, State> {
     handleSubmit(e: FormEvent){
         e.preventDefault();
         this.setState({submitError:false, submited:false},()=>{
-            firebaseApp.auth().createUserWithEmailAndPassword(
+            Auth.createUserWithEmailAndPassword(
                 this.state.email, this.state.password
             ).then(() => { 
                 console.log("Successful") 
-                const user: User|null = firebaseApp.auth().currentUser;
+                const user: User|null = Auth.currentUser;
     
                 if(user){
                     user.sendEmailVerification().then(()=> {
